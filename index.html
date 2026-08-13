@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ไดอารี่ของฉัน</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;1,7..72,500&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root{
+    --night:#14172A;
+    --night-deep:#0B0D18;
+    --paper:#EFE6D3;
+    --paper-dark:#E2D6BA;
+    --ink:#23262F;
+    --ink-soft:#6b6555;
+    --indigo:#3C4568;
+    --indigo-soft:#545F87;
+    --amber:#D9A45B;
+    --amber-bright:#F0C27E;
+    --wax:#9A2B25;
+    --sage:#6B8068;
+  }
+
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: linear-gradient(180deg, #1b1f36 0%, var(--night) 40%, var(--night-deep) 100%);
+    color:var(--paper);
+    font-family:'Literata', serif;
+    min-height:100vh;
+  }
+
+  .wrap{ max-width:640px; margin:0 auto; padding:34px 18px 70px; }
+
+  /* header */
+  .masthead{ text-align:center; margin-bottom:26px; }
+  .masthead h1{
+    font-family:'Caveat', cursive;
+    font-weight:700;
+    font-size:clamp(38px, 9vw, 54px);
+    margin:0 0 2px;
+    color:var(--amber-bright);
+    text-shadow:0 2px 14px rgba(217,164,91,0.25);
+  }
+  .tagline{ margin:0 0 14px; font-style:italic; font-size:13.5px; color:#9089a8; }
+  .stats-line{
+    font-family:'IBM Plex Mono', monospace; font-size:12px;
+    color:var(--amber-bright); letter-spacing:0.3px; margin-bottom:6px;
+  }
+  .share-note{ font-size:11px; color:#6b6f8c; margin:0 0 16px; }
+  .search-wrap{ display:flex; justify-content:center; }
+  .search-wrap input{
+    background: rgba(239,230,211,0.06);
+    border:1px solid rgba(217,164,91,0.3);
+    border-radius:20px;
+    padding:9px 16px;
+    color:var(--paper);
+    font-family:'Literata', serif;
+    font-size:13.5px;
+    width:260px;
+    outline:none;
+    transition: border-color .2s, background .2s;
+  }
+  .search-wrap input::placeholder{ color:rgba(239,230,211,0.35); }
+  .search-wrap input:focus{ border-color:var(--amber-bright); background:rgba(239,230,211,0.1); }
+
+  /* diary page */
+  .page{
+    position:relative;
+    background:var(--paper);
+    color:var(--ink);
+    border-radius:2px;
+    padding:26px 24px 20px;
+    margin:22px 0 26px;
+    box-shadow:0 18px 40px rgba(0,0,0,0.45);
+  }
+  .page::before{
+    content:'';
+    position:absolute; top:-9px; left:0; right:0; height:14px;
+    background:
+      linear-gradient(-45deg, var(--paper) 7px, transparent 0),
+      linear-gradient(45deg, var(--paper) 7px, transparent 0);
+    background-size:14px 14px;
+    background-repeat:repeat-x;
+  }
+  .page-nav{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:6px;
+  }
+  .nav-btn{
+    background:none; border:none; cursor:pointer;
+    font-family:'IBM Plex Mono', monospace; font-size:13px;
+    color:var(--ink-soft); padding:6px 8px;
+    transition:color .15s;
+  }
+  .nav-btn:hover:not(:disabled){ color:var(--wax); }
+  .nav-btn:disabled{ opacity:0.3; cursor:default; }
+  .today-btn{
+    font-family:'IBM Plex Mono', monospace; font-size:11px;
+    background:rgba(154,43,37,0.08); border:1px solid rgba(154,43,37,0.35);
+    color:var(--wax); border-radius:14px; padding:4px 12px; cursor:pointer;
+  }
+  .today-btn:hover{ background:rgba(154,43,37,0.15); }
+  .date-header{ text-align:center; margin-bottom:14px; }
+  .date-weekday{
+    font-family:'IBM Plex Mono', monospace; font-size:11px;
+    text-transform:uppercase; letter-spacing:1.5px; color:var(--ink-soft);
+  }
+  .date-main{
+    font-family:'Caveat', cursive; font-weight:700; font-size:34px;
+    color:var(--ink); margin-top:2px;
+  }
+  .mood-row{
+    display:flex; justify-content:center; gap:8px; margin-bottom:16px; flex-wrap:wrap;
+  }
+  .mood-btn{
+    font-size:22px; background:none; border:2px solid transparent;
+    border-radius:50%; width:42px; height:42px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition: transform .15s, border-color .15s, background .15s;
+    opacity:0.55;
+  }
+  .mood-btn:hover{ opacity:0.85; transform:scale(1.08); }
+  .mood-btn.active{
+    opacity:1; border-color:var(--amber); background:rgba(217,164,91,0.15);
+    transform:scale(1.1);
+  }
+  textarea#entryText{
+    width:100%; min-height:220px; border:1px solid rgba(43,36,32,0.18);
+    border-radius:2px; background:transparent;
+    font-family:'Literata', serif; font-size:15.5px; color:var(--ink);
+    line-height:28px; padding:4px 6px 4px 8px;
+    background-image: repeating-linear-gradient(180deg, transparent, transparent 27px, rgba(43,36,32,0.16) 28px);
+    resize:vertical; outline:none;
+  }
+  textarea#entryText:focus{ border-color:var(--wax); }
+  .page-footer{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-top:12px; flex-wrap:wrap; gap:10px;
+  }
+  .char-count{ font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:var(--ink-soft); }
+  .footer-actions{ display:flex; gap:14px; align-items:center; }
+  .btn-save{
+    font-family:'IBM Plex Mono', monospace; font-size:13px; font-weight:500;
+    background:var(--wax); color:var(--paper); border:none; border-radius:3px;
+    padding:10px 18px; cursor:pointer; transition:background .15s;
+  }
+  .btn-save:hover{ background:#b53a32; }
+  .btn-save.saved{ background:var(--sage); }
+  .btn-delete-entry{
+    font-family:'IBM Plex Mono', monospace; font-size:11px;
+    background:none; border:none; color:var(--ink-soft); text-decoration:underline;
+    cursor:pointer; padding:2px;
+  }
+  .btn-delete-entry:hover{ color:var(--wax); }
+
+  /* calendar */
+  .calendar-section{
+    background: rgba(239,230,211,0.04);
+    border:1px solid rgba(217,164,91,0.18);
+    border-radius:6px; padding:16px 16px 14px;
+  }
+  .cal-nav{
+    display:flex; align-items:center; justify-content:center; gap:14px;
+    font-family:'IBM Plex Mono', monospace; font-size:13px;
+    color:var(--amber-bright); margin-bottom:12px;
+  }
+  .cal-nav button{
+    background:none; border:none; color:var(--amber-bright); cursor:pointer;
+    font-size:15px; padding:2px 8px;
+  }
+  .cal-nav button:disabled{ opacity:0.25; cursor:default; }
+  .cal-grid{
+    display:grid; grid-template-columns:repeat(7, 1fr); gap:4px; text-align:center;
+  }
+  .cal-weekday{
+    font-family:'IBM Plex Mono', monospace; font-size:10px;
+    color:#8a86a0; padding-bottom:4px;
+  }
+  .cal-cell{
+    position:relative; aspect-ratio:1; display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono', monospace; font-size:11px; color:#c9c4d8;
+    border-radius:5px; cursor:pointer; background:rgba(255,255,255,0.02);
+    transition:background .15s;
+  }
+  .cal-cell:hover:not(.cal-empty):not(.cal-future){ background:rgba(217,164,91,0.12); }
+  .cal-cell.cal-empty{ cursor:default; visibility:hidden; }
+  .cal-cell.cal-future{ opacity:0.25; cursor:default; }
+  .cal-cell.cal-selected{ outline:1.5px solid var(--amber-bright); }
+  .cal-cell.cal-today .cal-num{ color:var(--wax); }
+  .cal-cell.cal-today::after{
+    content:''; position:absolute; inset:1px; border-radius:5px;
+    border:1.5px solid var(--wax); pointer-events:none;
+  }
+  .cal-num{ position:relative; z-index:1; }
+  .ink-blot{
+    position:absolute; background:var(--amber);
+    border-radius:42% 58% 47% 53% / 53% 41% 59% 47%;
+    z-index:0; opacity:0.85;
+  }
+
+  /* search results */
+  .search-results{ margin:22px 0; }
+  .search-empty{ text-align:center; color:#8a86a0; font-style:italic; font-size:13.5px; padding:20px 0; }
+  .result-item{
+    background:rgba(239,230,211,0.05); border:1px solid rgba(217,164,91,0.15);
+    border-radius:6px; padding:12px 14px; margin-bottom:8px; cursor:pointer;
+    transition:background .15s;
+  }
+  .result-item:hover{ background:rgba(217,164,91,0.1); }
+  .result-date{
+    font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--amber-bright);
+    display:flex; align-items:center; gap:6px; margin-bottom:4px;
+  }
+  .result-snippet{ font-size:13.5px; color:#d8d3e6; line-height:1.5; }
+
+  button:focus-visible, input:focus-visible, textarea:focus-visible, .cal-cell:focus-visible{
+    outline:2px solid var(--amber-bright); outline-offset:2px;
+  }
+
+  @media (max-width:480px){
+    .wrap{ padding:24px 12px 50px; }
+    .page{ padding:20px 16px 16px; }
+    .search-wrap input{ width:220px; }
+  }
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="masthead">
+    <h1>ไดอารี่ของฉัน</h1>
+    <p class="tagline">บันทึกเรื่องราวของทุกวัน ก่อนความทรงจำจะจางไป</p>
+    <div class="stats-line" id="statsLine">กำลังโหลด…</div>
+    <p class="share-note">✦ บันทึกเก็บไว้ในเบราว์เซอร์นี้เท่านั้น ✦</p>
+    <div class="search-wrap">
+      <input type="text" id="searchInput" placeholder="ค้นหาในบันทึกเก่า…" />
+    </div>
+  </header>
+
+  <div id="normalView">
+    <section class="page">
+      <div class="page-nav">
+        <button class="nav-btn" id="prevDayBtn">‹ วันก่อนหน้า</button>
+        <button class="today-btn" id="todayBtn">วันนี้</button>
+        <button class="nav-btn" id="nextDayBtn">วันถัดไป ›</button>
+      </div>
+      <div class="date-header">
+        <div class="date-weekday" id="dateWeekday"></div>
+        <div class="date-main" id="dateMain"></div>
+      </div>
+      <div class="mood-row" id="moodRow"></div>
+      <textarea id="entryText" placeholder="วันนี้เกิดอะไรขึ้นบ้าง…"></textarea>
+      <div class="page-footer">
+        <span class="char-count" id="charCount">0 ตัวอักษร</span>
+        <div class="footer-actions">
+          <button class="btn-delete-entry" id="deleteEntryBtn" style="display:none;">ลบบันทึกวันนี้</button>
+          <button class="btn-save" id="saveBtn">บันทึกหน้านี้</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="calendar-section">
+      <div class="cal-nav">
+        <button id="calPrevBtn">‹</button>
+        <span id="calLabel"></span>
+        <button id="calNextBtn">›</button>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+    </section>
+  </div>
+
+  <div class="search-results" id="searchResults" style="display:none;"></div>
+</div>
+
+<script>
+(function(){
+  const MOODS = [
+    {key:'happy', icon:'😊'},
+    {key:'okay', icon:'🙂'},
+    {key:'tired', icon:'😴'},
+    {key:'sad', icon:'😔'},
+    {key:'anxious', icon:'😟'},
+    {key:'angry', icon:'😠'}
+  ];
+  const WEEKDAYS_FULL = ['วันอาทิตย์','วันจันทร์','วันอังคาร','วันพุธ','วันพฤหัสบดี','วันศุกร์','วันเสาร์'];
+  const WEEKDAYS_SHORT = ['อา','จ','อ','พ','พฤ','ศ','ส'];
+  const MONTHS = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+  const LOCAL_KEY = 'daily-journal-entries-v1';
+
+  let entries = {};
+  let selectedDate = fmtDate(new Date());
+  let currentMood = null;
+  let calendarYear, calendarMonth;
+  let saveTimer = null;
+
+  const $ = (id) => document.getElementById(id);
+
+  function fmtDate(d){
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,'0');
+    const day = String(d.getDate()).padStart(2,'0');
+    return `${y}-${m}-${day}`;
+  }
+  function parseKey(key){
+    const [y,m,d] = key.split('-').map(Number);
+    return new Date(y, m-1, d);
+  }
+  function todayKey(){ return fmtDate(new Date()); }
+
+  function loadEntries(){
+    try{
+      const raw = localStorage.getItem(LOCAL_KEY);
+      entries = raw ? JSON.parse(raw) : {};
+    }catch(e){
+      console.error('Storage read error:', e);
+      entries = {};
+    }
+  }
+  function saveEntries(){
+    try{
+      localStorage.setItem(LOCAL_KEY, JSON.stringify(entries));
+    }catch(e){
+      console.error('Storage write error:', e);
+    }
+  }
+
+  function commitCurrentEntry(){
+    const text = $('entryText').value;
+    if (text.trim() === '' && !currentMood){
+      return;
+    }
+    const existing = entries[selectedDate];
+    entries[selectedDate] = {
+      text: text,
+      mood: currentMood,
+      length: text.trim().length,
+      createdAt: existing ? existing.createdAt : new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    saveEntries();
+  }
+
+  function calcStreak(){
+    const tKey = todayKey();
+    let cursor = new Date();
+    cursor.setHours(0,0,0,0);
+    if (!entries[fmtDate(cursor)]){
+      cursor.setDate(cursor.getDate()-1);
+    }
+    let count = 0;
+    while (entries[fmtDate(cursor)]){
+      count++;
+      cursor.setDate(cursor.getDate()-1);
+    }
+    return count;
+  }
+
+  function updateStats(){
+    const totalDays = Object.keys(entries).length;
+    const streak = calcStreak();
+    $('statsLine').textContent = totalDays === 0
+      ? 'หน้ายังว่างอยู่ · เริ่มบันทึกวันแรกกันเลย'
+      : `🔥 เขียนต่อเนื่อง ${streak} วัน · บันทึกไว้แล้ว ${totalDays.toLocaleString('th-TH')} วัน`;
+  }
+
+  function updateCharCount(){
+    const len = $('entryText').value.trim().length;
+    $('charCount').textContent = `${len.toLocaleString('th-TH')} ตัวอักษร`;
+  }
+
+  function renderMoodRow(){
+    const row = $('moodRow');
+    row.innerHTML = '';
+    MOODS.forEach(m=>{
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'mood-btn' + (currentMood === m.key ? ' active' : '');
+      btn.textContent = m.icon;
+      btn.setAttribute('aria-label', m.key);
+      btn.addEventListener('click', ()=>{
+        currentMood = (currentMood === m.key) ? null : m.key;
+        renderMoodRow();
+        commitCurrentEntry();
+        renderCalendar();
+        updateStats();
+      });
+      row.appendChild(btn);
+    });
+  }
+
+  function updateDateHeader(){
+    const d = parseKey(selectedDate);
+    $('dateWeekday').textContent = WEEKDAYS_FULL[d.getDay()];
+    $('dateMain').textContent = `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()+543}`;
+  }
+
+  function updateNavButtons(){
+    $('nextDayBtn').disabled = (selectedDate >= todayKey());
+  }
+
+  function loadDateIntoView(key){
+    selectedDate = key;
+    const entry = entries[key] || null;
+    currentMood = entry ? entry.mood : null;
+    $('entryText').value = entry ? entry.text : '';
+    const d = parseKey(key);
+    calendarYear = d.getFullYear();
+    calendarMonth = d.getMonth();
+    updateDateHeader();
+    updateNavButtons();
+    updateCharCount();
+    renderMoodRow();
+    renderCalendar();
+    updateStats();
+    $('deleteEntryBtn').style.display = entry ? 'inline' : 'none';
+    $('saveBtn').textContent = 'บันทึกหน้านี้';
+    $('saveBtn').classList.remove('saved');
+  }
+
+  function renderCalendar(){
+    $('calLabel').textContent = `${MONTHS[calendarMonth]} ${calendarYear+543}`;
+    const now = new Date(); now.setHours(0,0,0,0);
+    const isCurrentMonth = (calendarYear === now.getFullYear() && calendarMonth === now.getMonth());
+    $('calNextBtn').disabled = isCurrentMonth;
+
+    const grid = $('calGrid');
+    grid.innerHTML = '';
+    WEEKDAYS_SHORT.forEach(w=>{
+      const el = document.createElement('div');
+      el.className = 'cal-weekday';
+      el.textContent = w;
+      grid.appendChild(el);
+    });
+
+    const firstWeekday = new Date(calendarYear, calendarMonth, 1).getDay();
+    const daysInMonth = new Date(calendarYear, calendarMonth+1, 0).getDate();
+
+    for (let i=0;i<firstWeekday;i++){
+      const blank = document.createElement('div');
+      blank.className = 'cal-cell cal-empty';
+      grid.appendChild(blank);
+    }
+
+    for (let day=1; day<=daysInMonth; day++){
+      const cellDate = new Date(calendarYear, calendarMonth, day);
+      const key = fmtDate(cellDate);
+      const cell = document.createElement('div');
+      cell.className = 'cal-cell';
+      cell.tabIndex = 0;
+
+      const isFuture = cellDate > now;
+      const isToday = key === todayKey();
+      const isSelected = key === selectedDate;
+      if (isFuture) cell.classList.add('cal-future');
+      if (isToday) cell.classList.add('cal-today');
+      if (isSelected) cell.classList.add('cal-selected');
+
+      const num = document.createElement('span');
+      num.className = 'cal-num';
+      num.textContent = day;
+      cell.appendChild(num);
+
+      const entry = entries[key];
+      if (entry && entry.length > 0){
+        const size = Math.min(26, 8 + Math.sqrt(entry.length) * 1.3);
+        const blot = document.createElement('div');
+        blot.className = 'ink-blot';
+        blot.style.width = size + 'px';
+        blot.style.height = size + 'px';
+        blot.style.left = `calc(50% - ${size/2}px)`;
+        blot.style.top = `calc(50% - ${size/2}px)`;
+        cell.appendChild(blot);
+      }
+
+      if (!isFuture){
+        cell.addEventListener('click', ()=>{
+          commitCurrentEntry();
+          loadDateIntoView(key);
+        });
+        cell.addEventListener('keydown', (e)=>{
+          if (e.key === 'Enter' || e.key === ' '){
+            e.preventDefault();
+            commitCurrentEntry();
+            loadDateIntoView(key);
+          }
+        });
+      }
+      grid.appendChild(cell);
+    }
+  }
+
+  function runSearch(term){
+    const results = Object.keys(entries)
+      .filter(key => entries[key].text.toLowerCase().includes(term))
+      .sort((a,b)=> b.localeCompare(a));
+
+    const container = $('searchResults');
+    container.innerHTML = '';
+    if (results.length === 0){
+      const empty = document.createElement('div');
+      empty.className = 'search-empty';
+      empty.textContent = 'ไม่พบบันทึกที่ตรงกับคำค้นหา';
+      container.appendChild(empty);
+      return;
+    }
+    results.forEach(key=>{
+      const entry = entries[key];
+      const d = parseKey(key);
+      const item = document.createElement('div');
+      item.className = 'result-item';
+      item.tabIndex = 0;
+
+      const dateEl = document.createElement('div');
+      dateEl.className = 'result-date';
+      const mood = MOODS.find(m=>m.key===entry.mood);
+      dateEl.textContent = `${WEEKDAYS_FULL[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()+543}` + (mood ? '  ' + mood.icon : '');
+
+      const snippetEl = document.createElement('div');
+      snippetEl.className = 'result-snippet';
+      const snippet = entry.text.trim().slice(0, 120);
+      snippetEl.textContent = snippet + (entry.text.trim().length > 120 ? '…' : '');
+
+      item.appendChild(dateEl);
+      item.appendChild(snippetEl);
+
+      const go = ()=>{
+        commitCurrentEntry();
+        loadDateIntoView(key);
+        $('searchInput').value = '';
+        toggleSearchView(false);
+      };
+      item.addEventListener('click', go);
+      item.addEventListener('keydown', (e)=>{ if (e.key==='Enter') go(); });
+
+      container.appendChild(item);
+    });
+  }
+
+  function toggleSearchView(show){
+    $('normalView').style.display = show ? 'none' : 'block';
+    $('searchResults').style.display = show ? 'block' : 'none';
+  }
+
+  // ---- events ----
+  $('prevDayBtn').addEventListener('click', ()=>{
+    commitCurrentEntry();
+    const d = parseKey(selectedDate);
+    d.setDate(d.getDate()-1);
+    loadDateIntoView(fmtDate(d));
+  });
+  $('nextDayBtn').addEventListener('click', ()=>{
+    if (selectedDate >= todayKey()) return;
+    commitCurrentEntry();
+    const d = parseKey(selectedDate);
+    d.setDate(d.getDate()+1);
+    loadDateIntoView(fmtDate(d));
+  });
+  $('todayBtn').addEventListener('click', ()=>{
+    commitCurrentEntry();
+    loadDateIntoView(todayKey());
+  });
+
+  $('entryText').addEventListener('input', ()=>{
+    updateCharCount();
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(()=>{
+      commitCurrentEntry();
+      renderCalendar();
+      updateStats();
+    }, 800);
+  });
+
+  $('saveBtn').addEventListener('click', ()=>{
+    commitCurrentEntry();
+    renderCalendar();
+    updateStats();
+    const btn = $('saveBtn');
+    btn.textContent = 'บันทึกแล้ว ✓';
+    btn.classList.add('saved');
+    $('deleteEntryBtn').style.display = 'inline';
+    setTimeout(()=>{
+      btn.textContent = 'บันทึกหน้านี้';
+      btn.classList.remove('saved');
+    }, 1400);
+  });
+
+  $('deleteEntryBtn').addEventListener('click', ()=>{
+    if (!confirm('ลบบันทึกของวันนี้เลยไหม?')) return;
+    delete entries[selectedDate];
+    saveEntries();
+    loadDateIntoView(selectedDate);
+  });
+
+  $('calPrevBtn').addEventListener('click', ()=>{
+    calendarMonth--;
+    if (calendarMonth < 0){ calendarMonth = 11; calendarYear--; }
+    renderCalendar();
+  });
+  $('calNextBtn').addEventListener('click', ()=>{
+    const now = new Date();
+    const isCurrentMonth = (calendarYear === now.getFullYear() && calendarMonth === now.getMonth());
+    if (isCurrentMonth) return;
+    calendarMonth++;
+    if (calendarMonth > 11){ calendarMonth = 0; calendarYear++; }
+    renderCalendar();
+  });
+
+  $('searchInput').addEventListener('input', (e)=>{
+    const term = e.target.value.trim().toLowerCase();
+    if (term === ''){
+      toggleSearchView(false);
+      return;
+    }
+    toggleSearchView(true);
+    runSearch(term);
+  });
+
+  document.addEventListener('visibilitychange', ()=>{
+    if (document.visibilityState === 'hidden') commitCurrentEntry();
+  });
+
+  loadEntries();
+  loadDateIntoView(selectedDate);
+})();
+</script>
+</body>
+</html>
